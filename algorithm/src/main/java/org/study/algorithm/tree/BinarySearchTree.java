@@ -66,6 +66,9 @@ public class BinarySearchTree<AnyType extends Comparable<? super AnyType>> {
 	}
 
 	public void printTree() {
+		if(isEmpty()) {
+			System.out.println("Empty tree");
+		}
 		printTree(root);
 	}
 
@@ -112,40 +115,19 @@ public class BinarySearchTree<AnyType extends Comparable<? super AnyType>> {
 
 	private BinaryNode<AnyType> insert(AnyType x, BinaryNode<AnyType> t) {
 		if (null == t) {
-			return null;
+			return new BinaryNode<>(x, null, null);
 		}
 
-		// 判断x是否小于节点的左叶子节点，如果小于，则左叶子节点成为父节点，x设置为其左叶子节点
-		if (null == t.left || x.compareTo(t.left.element) <= 0) {
-			BinaryNode<AnyType> newNode = new BinaryNode<>(x);
-			if (null == t.left) {
-				t.left = newNode;
-			}
+		int compareResult = x.compareTo(t.element);
 
-			t.left.left = newNode;
+		if (compareResult < 0) {
+			t.left = insert(x, t.left);
+		} else if (compareResult > 0) {
+			t.right = insert(x, t.right);
+		} else {
+			; // 重复值，暂不处理
 		}
-		// 如果x介于左叶子节点与父节点之间，则设置x为当前节点的左节点，原左叶子节点下沉成为x的左节点
-		else if (x.compareTo(t.left.element) > 0 && x.compareTo(t.element) <= 0) {
-			BinaryNode<AnyType> newNode = new BinaryNode<>(x);
-			newNode.left = t.left;
-			t.left = newNode;
-		}
-		// 如果x小于当前父节点的左节点，则继续找
-		else if (x.compareTo(t.left.element) < 0) {
-			insert(x, t.left);
-		}
-		// 如果x介于父节点与右节点之间，则设置x为父节点，原父节点成为左节点
-		else if (null == t.right || x.compareTo(t.element) > 0) {
-			BinaryNode<AnyType> newNode = new BinaryNode<>(x);
-			newNode.left = t;
-			newNode.right = t.right;
-			t = newNode;
-		}
-		// 如果x大于右节点
-		else if (x.compareTo(t.right.element) > 0) {
-			insert(x, t.right);
-		}
-		
+
 		return t;
 	}
 
@@ -154,26 +136,18 @@ public class BinarySearchTree<AnyType extends Comparable<? super AnyType>> {
 	}
 
 	private void printTree(BinaryNode<AnyType> t) {
-		if (null == t) {
-			System.out.println("Tree is null");
-		}
-		BinaryNode<AnyType> currentNode = t;
-		int high = 1;
-		while (null != currentNode.left) {
-			System.out.println("第" + high + "层" + currentNode.element + " leftTree:" + currentNode.left.element);
-			currentNode = currentNode.left;
-		}
-		while (null != currentNode.right) {
-			System.out.println("第" + high + "层" + currentNode.element + " rightTree:" + currentNode.right.element);
-			currentNode = currentNode.right;
+		if(null != t) {
+			printTree(t.left);
+			System.out.println(t.element);
+			printTree(t.right);
 		}
 	}
-	
+
 	public static void main(String[] args) {
 		BinarySearchTree<Integer> tree = new BinarySearchTree<>();
 		BinaryNode<Integer> root = new BinaryNode<Integer>(12);
 		tree.root = root;
-		for(int i=10;i<13;i++) {
+		for (int i = 3; i < 17; i=i+i/2) {
 			tree.insert(i);
 		}
 		tree.printTree();
